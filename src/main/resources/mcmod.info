@@ -1,17 +1,12 @@
-[
-{
-  "modid": "psychedelicraft",
-  "name": "${modName}",
-  "description": "Adds drugs into Minecraft. Psychedelicraft specializes on realism and effects. Shaders are being utilized, so keep that in mind.",
+[{
+  "modid": "${modId}",
+  "name": "Psychedelicraft Legacy",
+  "description": "Farming, brewing and psychedelic effects for Minecraft 1.7.10.",
   "version": "${modVersion}",
   "mcversion": "${minecraftVersion}",
-  "url": "http://www.minecraftforum.net/topic/563257-152",
-  "updateUrl": "",
-  "authors": ["Ivorius", "TripleHeadedSheep"],
-  "credits": "Ivorius: Development, TripleHeadedSheep: Visuals",
-  "logoFile": "gfx/psychedelicraft/logo.png",
-  "screenshots": [],
-  "dependencies": [],
-  "required-after": ["ivtoolkit@[1.0.1,)"]
-}
-]
+  "url": "https://github.com/AngelicIndustries/Psychedelicraft-Legacy",
+  "authorList": ["Angelic Industries"],
+  "credits": "Ivorius, TripleHeadedSheep, Sollace, DrugsNotIncluded and contributors",
+  "logoFile": "assets/psychedelicraft/logo.png",
+  "dependencies": ["ivtoolkit"]
+}]

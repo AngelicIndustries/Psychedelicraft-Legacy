@@ -35,6 +35,13 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.MinecraftForgeClient;
 
+import ivorius.psychedelicraft.gui.*;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.IFluidHandler;
+import static ivorius.psychedelicraft.gui.PSGuiHandler.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,10 +58,17 @@ public class ClientProxy implements PSProxy
     public static double pauseMenuBlur;
 
     @Override
+    public void handleClientUpdate(cpw.mods.fml.common.network.simpleimpl.IMessage message,
+                                   cpw.mods.fml.common.network.simpleimpl.MessageContext context)
+    {
+        ClientPacketUpdates.schedule(message, context);
+    }
+
+    @Override
     public void preInit()
     {
-        Psychedelicraft.coreHandlerClient = new PSCoreHandlerClient();
-        Psychedelicraft.coreHandlerClient.register();
+        new PSCoreHandlerClient().register();
+        new ClientEventHandler().register();
     }
 
     @Override
@@ -91,7 +105,8 @@ public class ClientProxy implements PSProxy
         if (PSEntityList.villagerDealerProfessionID >= 0)
             VillagerRegistry.instance().registerVillagerSkin(PSEntityList.villagerDealerProfessionID, new ResourceLocation(Psychedelicraft.MODID, Psychedelicraft.filePathTextures + "villagerDealer.png"));
 
-        PSRenderStates.allocate();
+        ((net.minecraft.client.resources.IReloadableResourceManager) net.minecraft.client.Minecraft.getMinecraft().getResourceManager())
+                .registerReloadListener(manager -> PSRenderStates.allocate());
         PSRenderStates.outputShaderInfo();
     }
 
@@ -154,5 +169,39 @@ public class ClientProxy implements PSProxy
             for (String s : names)
                 readHasBGM(s, config);
         }
+    }
+    @Override
+    public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
+    {
+        if (id == dryingTableContainerID)
+            return new GuiDryingTable(player.inventory, world, (TileEntityDryingTable) world.getTileEntity(x, y, z));
+        else if (id >= fluidHandlerContainerID_DOWN && id <= fluidHandlerContainerID_EAST)
+        {
+            ForgeDirection forgeDirection = ForgeDirection.getOrientation(id - fluidHandlerContainerID_DOWN);
+
+            TileEntity tileEntity = world.getTileEntity(x, y, z);
+            if (tileEntity instanceof IFluidHandler)
+                return new GuiFluidHandler(player.inventory, tileEntity, (IFluidHandler) tileEntity, forgeDirection);
+        }
+        else if (id == barrelContainerID)
+        {
+            TileEntity tileEntity = world.getTileEntity(x, y, z);
+            if (tileEntity instanceof TileEntityBarrel)
+                return new GuiBarrel(player.inventory, (TileEntityBarrel) tileEntity);
+        }
+        else if (id == woodenVatContainerID)
+        {
+            TileEntity tileEntity = world.getTileEntity(x, y, z);
+            if (tileEntity instanceof TileEntityMashTub)
+                return new GuiWoodenVat(player.inventory, (TileEntityMashTub) tileEntity);
+        }
+        else if (id == distilleryContainerID)
+        {
+            TileEntity tileEntity = world.getTileEntity(x, y, z);
+            if (tileEntity instanceof TileEntityDistillery)
+                return new GuiDistillery(player.inventory, (TileEntityDistillery) tileEntity);
+        }
+
+        return null;
     }
 }

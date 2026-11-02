@@ -99,7 +99,7 @@ public class PSCoreHandlerClient
     @SubscribeEvent
     public void psycheGLBlendFunc(GLBlendFuncEvent event)
     {
-        PSRenderStates.setBlendFunc(event.sFactor, event.dFactor, event.dfactorAlpha, event.dfactorAlpha);
+        PSRenderStates.setBlendFunc(event.sFactor, event.dFactor, event.sfactorAlpha, event.dfactorAlpha);
     }
 
     @SubscribeEvent
@@ -160,26 +160,6 @@ public class PSCoreHandlerClient
             if (drugProperties != null && drugProperties.renderer != null)
             {
                 drugProperties.renderer.renderAllHallucinations(event.partialTicks, drugProperties);
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public void renderHand(RenderHandEvent event)
-    {
-        if (event instanceof RenderHandEvent.Pre)
-        {
-            if (!"Default".equals(PSRenderStates.currentRenderPass))
-            {
-                PSRenderStates.setDepthMultiplier(0.0f);
-                event.setCanceled(true);
-            }
-        }
-        else if (event instanceof RenderHandEvent.Post)
-        {
-            if (!"Default".equals(PSRenderStates.currentRenderPass))
-            {
-                PSRenderStates.setDepthMultiplier(1.0f);
             }
         }
     }

@@ -11,6 +11,7 @@ import cpw.mods.fml.common.MissingModsException;
 import cpw.mods.fml.common.versioning.ArtifactVersion;
 import cpw.mods.fml.common.versioning.DefaultArtifactVersion;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
 
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +34,9 @@ public class PsychedelicraftLoadingPlugin implements IFMLLoadingPlugin
     @Override
     public String[] getASMTransformerClass()
     {
+        if (!FMLLaunchHandler.side().isClient())
+            return new String[0];
+
         requireClass("ivorius.ivtoolkit.asm.IvClassTransformerManager", new DefaultArtifactVersion("ivtoolkit", true), MODID, NAME);
         return new String[]{PsychedelicraftClassTransformer.class.getName()};
     }

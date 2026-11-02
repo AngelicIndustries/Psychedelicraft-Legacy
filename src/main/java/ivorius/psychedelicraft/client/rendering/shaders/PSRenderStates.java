@@ -18,12 +18,13 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.resources.IResource;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.io.IOUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -189,10 +190,9 @@ public class PSRenderStates
 
         String utils = null;
 
-        try
+        try (InputStream stream = mc.getResourceManager().getResource(new ResourceLocation(Psychedelicraft.MODID, Psychedelicraft.filePathShaders + "shaderUtils.frag")).getInputStream())
         {
-            IResource utilsResource = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(Psychedelicraft.MODID, Psychedelicraft.filePathShaders + "shaderUtils.frag"));
-            utils = IOUtils.toString(utilsResource.getInputStream(), Charsets.UTF_8);
+            utils = IOUtils.toString(stream, Charsets.UTF_8);
         }
         catch (Exception ex)
         {
@@ -299,6 +299,13 @@ public class PSRenderStates
         }
     }
 
+    private static boolean isWorldShaderBound()
+    {
+        // Another renderer may have selected its own program since our world pass began.
+        return currentShader != null && currentShader.getShaderID() > 0
+                && GL11.glGetInteger(GL20.GL_CURRENT_PROGRAM) == currentShader.getShaderID();
+    }
+
     public static void setEnabled(int cap, boolean enabled)
     {
         if (cap == GL11.GL_TEXTURE_2D)
@@ -307,7 +314,7 @@ public class PSRenderStates
         {
             GLStateProxy.setEnabled(cap, enabled);
 
-            if (currentShader != null)
+            if (isWorldShaderBound())
             {
                 switch (cap)
                 {
@@ -326,17 +333,17 @@ public class PSRenderStates
     {
         GLStateProxy.setTextureEnabled(textureUnit, enabled);
 
-        if (textureUnit == OpenGlHelper.defaultTexUnit && currentShader != null)
+        if (textureUnit == OpenGlHelper.defaultTexUnit && isWorldShaderBound())
             currentShader.setTexture2DEnabled(enabled);
 
-        if (textureUnit == OpenGlHelper.lightmapTexUnit && currentShader != null)
+        if (textureUnit == OpenGlHelper.lightmapTexUnit && isWorldShaderBound())
             currentShader.setLightmapEnabled(enabled);
     }
 
     public static void setBlendFunc(int sFactor, int dFactor, int sFactorAlpha, int dFactorAlpha)
     {
         GLStateProxy.glBlendFunc(sFactor, dFactor, sFactorAlpha, dFactorAlpha);
-        if (currentShader != null)
+        if (isWorldShaderBound())
             currentShader.setBlendFunc(sFactor, dFactor, sFactorAlpha, dFactorAlpha);
     }
 
@@ -345,43 +352,43 @@ public class PSRenderStates
         if (color != null && color.length != 4)
             throw new IllegalArgumentException("Color must be a length-4 float array");
 
-        if (currentShader != null)
+        if (isWorldShaderBound())
             currentShader.setOverrideColor(color);
     }
 
     public static void setGLLightEnabled(boolean enabled)
     {
-        if (currentShader != null)
+        if (isWorldShaderBound())
             currentShader.setGLLightEnabled(enabled);
     }
 
     public static void setGLLight(int number, float x, float y, float z, float strength, float specular)
     {
-        if (currentShader != null)
+        if (isWorldShaderBound())
             currentShader.setGLLight(number, x, y, z, strength, specular);
     }
 
     public static void setGLLightAmbient(float strength)
     {
-        if (currentShader != null)
+        if (isWorldShaderBound())
             currentShader.setGLLightAmbient(strength);
     }
 
     public static void setFogMode(int mode)
     {
-        if (currentShader != null)
+        if (isWorldShaderBound())
             currentShader.setFogMode(mode);
     }
 
     public static void setDepthMultiplier(float depthMultiplier)
     {
-        if (currentShader != null)
+        if (isWorldShaderBound())
             currentShader.setDepthMultiplier(depthMultiplier);
     }
 
     public static void setUseScreenTexCoords(boolean enabled)
     {
-        if (currentShader != null)
+        if (isWorldShaderBound())
             currentShader.setUseScreenTexCoords(enabled);
     }
 
@@ -398,19 +405,19 @@ public class PSRenderStates
 
     public static void setPixelSize(float pixelWidth, float pixelHeight)
     {
-        if (currentShader != null)
+        if (isWorldShaderBound())
             currentShader.setPixelSize(pixelWidth, pixelHeight);
     }
 
     public static void setForceColorSafeMode(boolean enable)
     {
-        if (currentShader != null)
+        if (isWorldShaderBound())
             currentShader.setForceColorSafeMode(enable);
     }
 
     public static void setProjectShadows(boolean projectShadows)
     {
-        if (currentShader != null)
+        if (isWorldShaderBound())
             currentShader.setProjectShadows(projectShadows);
     }
 
@@ -477,7 +484,10 @@ public class PSRenderStates
         shaderInstanceDepth = null;
 
         if (shaderInstanceShadows != null)
+        {
             shaderInstanceShadows.deleteShader();
+            shaderInstanceShadows.depthBuffer.deallocate();
+        }
         shaderInstanceShadows = null;
     }
 
@@ -490,6 +500,11 @@ public class PSRenderStates
 
     public static void deallocate()
     {
+        if (currentShader != null)
+            currentShader.deactivate();
+        currentShader = null;
+        currentRenderPass = null;
+        didDepthPass = false;
         delete3DShaders();
         deleteRealtimeCacheTexture();
 

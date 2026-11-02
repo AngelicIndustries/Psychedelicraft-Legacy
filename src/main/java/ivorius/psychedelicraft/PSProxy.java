@@ -14,6 +14,9 @@ import net.minecraft.util.Vec3;
  */
 public interface PSProxy
 {
+    void handleClientUpdate(cpw.mods.fml.common.network.simpleimpl.IMessage message,
+                            cpw.mods.fml.common.network.simpleimpl.MessageContext context);
+
     void preInit();
 
     void registerRenderers();
@@ -23,4 +26,5 @@ public interface PSProxy
     void createDrugRenderer(DrugProperties drugProperties);
 
     void loadConfig(String configID);
+    Object getClientGuiElement(int id, net.minecraft.entity.player.EntityPlayer player, net.minecraft.world.World world, int x, int y, int z);
 }

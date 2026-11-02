@@ -14,9 +14,8 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
 import ivorius.ivtoolkit.network.PacketExtendedEntityPropertiesData;
-import ivorius.ivtoolkit.network.PacketExtendedEntityPropertiesDataHandler;
+import ivorius.psychedelicraft.network.ClientUpdateHandlers;
 import ivorius.ivtoolkit.network.PacketTileEntityData;
-import ivorius.ivtoolkit.network.PacketTileEntityDataHandler;
 import ivorius.psychedelicraft.achievements.PSAchievementList;
 import ivorius.psychedelicraft.commands.CommandDrug;
 import ivorius.psychedelicraft.commands.CommandPsyche;
@@ -36,13 +35,18 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.util.EnumHelper;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = Psychedelicraft.MODID, version = Psychedelicraft.VERSION, name = Psychedelicraft.NAME,
+@Mod(modid = Psychedelicraft.MODID, version = Psychedelicraft.VERSION, name = Psychedelicraft.NAME, acceptedMinecraftVersions = "[1.7.10]",
+        dependencies = "required-after:ivtoolkit",
+        customProperties = {
+            @Mod.CustomProperty(k = "license", v = "MIT"),
+            @Mod.CustomProperty(k = "issueTrackerUrl", v = "https://github.com/AngelicIndustries/Psychedelicraft-Legacy/issues"),
+            @Mod.CustomProperty(k = "iconFile", v = "assets/psychedelicraft/textures/items/cannabisLeaf.png") },
         guiFactory = "ivorius.psychedelicraft.gui.PSConfigGuiFactory")
 public class Psychedelicraft
 {
     public static final String MODID = "psychedelicraft";
-    public static final String NAME = "Psychedelicraft";
-    public static final String VERSION = "1.5.2";
+    public static final String NAME = "Psychedelicraft Legacy";
+    public static final String VERSION = Tags.VERSION;
 
     @Instance(value = "psychedelicraft")
     public static Psychedelicraft instance;
@@ -60,7 +64,6 @@ public class Psychedelicraft
 
     public static SimpleNetworkWrapper network;
 
-    public static PSCoreHandlerClient coreHandlerClient;
     public static PSCoreHandlerCommon coreHandlerCommon;
     public static PSCoreHandlerServer coreHandlerServer;
 
@@ -125,8 +128,8 @@ public class Psychedelicraft
     public void load(FMLInitializationEvent event)
     {
         network = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
-        network.registerMessage(PacketExtendedEntityPropertiesDataHandler.class, PacketExtendedEntityPropertiesData.class, 0, Side.CLIENT);
-        network.registerMessage(PacketTileEntityDataHandler.class, PacketTileEntityData.class, 1, Side.CLIENT);
+        network.registerMessage(ClientUpdateHandlers.EntityData.class, PacketExtendedEntityPropertiesData.class, 0, Side.CLIENT);
+        network.registerMessage(ClientUpdateHandlers.TileData.class, PacketTileEntityData.class, 1, Side.CLIENT);
 
         proxy.registerRenderers();
 

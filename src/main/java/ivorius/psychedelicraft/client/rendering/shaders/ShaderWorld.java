@@ -12,6 +12,8 @@ public interface ShaderWorld
 {
     public boolean isShaderActive();
 
+    int getShaderID();
+
     public boolean activate(float partialTicks, float ticks);
 
     public void deactivate();

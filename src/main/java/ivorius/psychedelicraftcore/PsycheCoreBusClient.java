@@ -106,7 +106,7 @@ public class PsycheCoreBusClient
 
     public static void postRenderHand(float partialTicks)
     {
-        PsycheCoreBusCommon.EVENT_BUS.post(new RenderHandEvent.Pre(partialTicks));
+        PsycheCoreBusCommon.EVENT_BUS.post(new RenderHandEvent.Post(partialTicks));
     }
 
     public static void setPlayerAngles(float partialTicks)

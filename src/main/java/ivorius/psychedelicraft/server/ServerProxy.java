@@ -15,6 +15,13 @@ import net.minecraft.util.Vec3;
 public class ServerProxy implements PSProxy
 {
     @Override
+    public void handleClientUpdate(cpw.mods.fml.common.network.simpleimpl.IMessage message,
+                                   cpw.mods.fml.common.network.simpleimpl.MessageContext context)
+    {
+        ivorius.psychedelicraft.network.ClientUpdateHandlers.payload(message).release();
+    }
+
+    @Override
     public void preInit()
     {
         Psychedelicraft.coreHandlerServer = new PSCoreHandlerServer();
@@ -43,5 +50,9 @@ public class ServerProxy implements PSProxy
     public void loadConfig(String configID)
     {
 
+    }
+    @Override
+    public Object getClientGuiElement(int id, net.minecraft.entity.player.EntityPlayer player, net.minecraft.world.World world, int x, int y, int z) {
+        return null;
     }
 }

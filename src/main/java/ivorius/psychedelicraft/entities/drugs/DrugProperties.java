@@ -16,6 +16,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.BaseAttributeMap;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
@@ -446,14 +447,24 @@ public class DrugProperties implements IExtendedEntityProperties, PartialUpdateH
 
     public void changeDrugModifier(EntityLivingBase entity, IAttribute attribute, double value, int mode)
     {
-        IAttributeInstance speedInstance = entity.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
-        AttributeModifier oldModifier = speedInstance.getModifier(DrugProperties.drugUUID);
+        changeDrugModifier(entity.getAttributeMap(), attribute, value, mode);
+    }
+
+    static void changeDrugModifier(BaseAttributeMap attributes, IAttribute attribute, double value, int mode)
+    {
+        IAttributeInstance instance = attributes.getAttributeInstance(attribute);
+        if (instance == null)
+            return;
+
+        AttributeModifier oldModifier = instance.getModifier(drugUUID);
+        if (oldModifier != null && oldModifier.getAmount() == value && oldModifier.getOperation() == mode)
+            return;
 
         if (oldModifier != null)
-            speedInstance.removeModifier(oldModifier);
+            instance.removeModifier(oldModifier);
 
-        AttributeModifier newModifier = new AttributeModifier(DrugProperties.drugUUID, "Drug Effects", value, mode);
-        speedInstance.applyModifier(newModifier);
+        if (value != 0.0)
+            instance.applyModifier(new AttributeModifier(drugUUID, "Drug Effects", value, mode));
     }
 
     // IExtendedEntityProperties

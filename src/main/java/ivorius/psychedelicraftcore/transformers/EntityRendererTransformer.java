@@ -29,7 +29,6 @@ public class EntityRendererTransformer extends IvClassTransformerClass
         registerExpectedMethod("renderHand", "func_78476_b", getMethodDescriptor(Type.VOID_TYPE, Type.FLOAT_TYPE, Type.INT_TYPE));
         registerExpectedMethod("enableLightmap", "func_78463_b", getMethodDescriptor(Type.VOID_TYPE, Double.TYPE));
         registerExpectedMethod("disableLightmap", "func_78483_a", getMethodDescriptor(Type.VOID_TYPE, Double.TYPE));
-        registerExpectedMethod("renderWorld", "func_78471_a", getMethodDescriptor(Type.VOID_TYPE, Type.FLOAT_TYPE, Type.LONG_TYPE));
         registerExpectedMethod("renderWorldAdditions", "func_78471_a", getMethodDescriptor(Type.VOID_TYPE, Type.FLOAT_TYPE, Type.LONG_TYPE));
         registerExpectedMethod("setupFog", "func_78468_a", getMethodDescriptor(Type.VOID_TYPE, Type.INT_TYPE, Type.FLOAT_TYPE));
         registerExpectedMethod("setupCameraTransform", "func_78479_a", getMethodDescriptor(Type.VOID_TYPE, Type.FLOAT_TYPE, Type.INT_TYPE));
@@ -90,7 +89,7 @@ public class EntityRendererTransformer extends IvClassTransformerClass
             case "disableLightmap":
             {
                 InsnList list = new InsnList();
-                list.add(new MethodInsnNode(INVOKESTATIC, "ivorius/psychedelicraftcore/PsycheCoreBusClient", "enableLightmap", getMethodDescriptor(Type.VOID_TYPE), false));
+                list.add(new MethodInsnNode(INVOKESTATIC, "ivorius/psychedelicraftcore/PsycheCoreBusClient", "disableLightmap", getMethodDescriptor(Type.VOID_TYPE), false));
                 methodNode.instructions.insert(methodNode.instructions.get(0), list);
 
                 return true;
@@ -131,33 +130,6 @@ public class EntityRendererTransformer extends IvClassTransformerClass
                 }
 
                 return true;
-            case "renderWorld":
-                AbstractInsnNode transformNode = IvNodeFinder.findNode(new IvNodeMatcherMethod(INVOKESPECIAL, "func_78476_b" /* renderHand */, "net/minecraft/client/renderer/EntityRenderer", Type.VOID_TYPE, Type.FLOAT_TYPE, Type.INT_TYPE), methodNode);
-
-                if (transformNode != null)
-                {
-                    AbstractInsnNode glClearNode = transformNode.getPrevious().getPrevious().getPrevious().getPrevious().getPrevious().getPrevious();
-
-                    if (glClearNode.getOpcode() == INVOKESTATIC && ((MethodInsnNode) glClearNode).name.equals("glClear") && ((MethodInsnNode) glClearNode).owner.equals("org/lwjgl/opengl/GL11"))
-                    {
-                        LabelNode skipGLClearNode = new LabelNode();
-                        methodNode.instructions.insert(glClearNode, skipGLClearNode);
-
-                        InsnList preList = new InsnList();
-                        preList.add(new VarInsnNode(FLOAD, 1));
-                        preList.add(new MethodInsnNode(INVOKESTATIC, "ivorius/psychedelicraftcore/PsycheCoreBusClient", "preRenderHand", getMethodDescriptor(Type.BOOLEAN_TYPE, Type.FLOAT_TYPE), false));
-                        preList.add(new JumpInsnNode(IFNE, skipGLClearNode));
-                        methodNode.instructions.insertBefore(glClearNode.getPrevious(), preList);
-
-                        InsnList postList = new InsnList();
-                        postList.add(new VarInsnNode(FLOAD, 1));
-                        postList.add(new MethodInsnNode(INVOKESTATIC, "ivorius/psychedelicraftcore/PsycheCoreBusClient", "postRenderHand", getMethodDescriptor(Type.VOID_TYPE, Type.FLOAT_TYPE), false));
-                        methodNode.instructions.insert(transformNode, postList);
-
-                        return true;
-                    }
-                }
-                break;
             case "setupFog":
                 List<AbstractInsnNode> glFogiNodes = IvNodeFinder.findNodes(new IvNodeMatcherMethodSRG(INVOKESTATIC, "glFogi", "org/lwjgl/opengl/GL11", null), methodNode);
 

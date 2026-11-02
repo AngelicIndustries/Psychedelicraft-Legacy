@@ -27,12 +27,12 @@ public class PsychedelicraftCoreContainer extends DummyModContainer
         super(new ModMetadata());
 
         ModMetadata myMeta = super.getMetadata();
-        myMeta.authorList = Arrays.asList("Ivorius");
+        myMeta.authorList = Arrays.asList("Angelic Industries", "Ivorius");
         myMeta.description = "CoreMod for Psychedelicraft. Required API Psychedelicraft is built on top of. ";
         myMeta.modId = PsychedelicraftLoadingPlugin.MODID;
-        myMeta.version = "1.4";
+        myMeta.version = ivorius.psychedelicraft.Tags.VERSION;
         myMeta.name = PsychedelicraftLoadingPlugin.NAME;
-        myMeta.url = "http://www.minecraftforum.net/topic/563257-172";
+        myMeta.url = "https://github.com/AngelicIndustries/Psychedelicraft-Legacy";
         myMeta.requiredMods.add(new DefaultArtifactVersion("ivtoolkit", true));
     }
 

@@ -1,6 +1,6 @@
 #version 120
 
-#define MAX_LIGHTS 3
+#define MAX_LIGHTS 2
 
 uniform sampler2D texture;
 uniform sampler2D lightmapTex;
@@ -109,9 +109,8 @@ void main()
         
         for (int i = 0; i < MAX_LIGHTS; i++)
         {
-            float glLightColor = glLightAmbient;
             vec3 lightVec = normalize(gl_LightSource[i].position.xyz);
-            vec4 lightDiff = gl_FrontLightProduct[i].diffuse * max(dot(normalVector, lightVec), 0.0);
+            vec4 lightDiff = (gl_LightSource[i].diffuse * gl_FrontMaterial.diffuse) * max(dot(normalVector, lightVec), 0.0);
             
             finalLightColor += lightDiff.rgb;
         }

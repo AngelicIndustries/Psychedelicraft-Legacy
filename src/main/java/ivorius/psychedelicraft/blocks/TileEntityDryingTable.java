@@ -53,7 +53,7 @@ public class TileEntityDryingTable extends TileEntity implements ISidedInventory
         {
             calculateHeatRatio();
 
-            if (worldObj.getRainStrength(1.0f) > 0.0f && worldObj.getPrecipitationHeight(xCoord, yCoord) == yCoord + 1)
+            if (worldObj.getRainStrength(1.0f) > 0.0f && worldObj.getPrecipitationHeight(xCoord, zCoord) == yCoord + 1)
                 dryingProgress = 0;
 
             IvNetworkHelperServer.sendTileEntityUpdatePacket(this, "dryingProgress", Psychedelicraft.network);

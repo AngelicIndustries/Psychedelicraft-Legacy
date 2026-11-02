@@ -69,38 +69,9 @@ public class PSGuiHandler implements IGuiHandler
         return null;
     }
 
+
     @Override
-    public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
-    {
-        if (id == dryingTableContainerID)
-            return new GuiDryingTable(player.inventory, world, (TileEntityDryingTable) world.getTileEntity(x, y, z));
-        else if (id >= fluidHandlerContainerID_DOWN && id <= fluidHandlerContainerID_EAST)
-        {
-            ForgeDirection forgeDirection = ForgeDirection.getOrientation(id - fluidHandlerContainerID_DOWN);
-
-            TileEntity tileEntity = world.getTileEntity(x, y, z);
-            if (tileEntity instanceof IFluidHandler)
-                return new GuiFluidHandler(player.inventory, tileEntity, (IFluidHandler) tileEntity, forgeDirection);
-        }
-        else if (id == barrelContainerID)
-        {
-            TileEntity tileEntity = world.getTileEntity(x, y, z);
-            if (tileEntity instanceof TileEntityBarrel)
-                return new GuiBarrel(player.inventory, (TileEntityBarrel) tileEntity);
-        }
-        else if (id == woodenVatContainerID)
-        {
-            TileEntity tileEntity = world.getTileEntity(x, y, z);
-            if (tileEntity instanceof TileEntityMashTub)
-                return new GuiWoodenVat(player.inventory, (TileEntityMashTub) tileEntity);
-        }
-        else if (id == distilleryContainerID)
-        {
-            TileEntity tileEntity = world.getTileEntity(x, y, z);
-            if (tileEntity instanceof TileEntityDistillery)
-                return new GuiDistillery(player.inventory, (TileEntityDistillery) tileEntity);
-        }
-
-        return null;
+    public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
+        return ivorius.psychedelicraft.Psychedelicraft.proxy.getClientGuiElement(id, player, world, x, y, z);
     }
 }
